@@ -7,23 +7,6 @@ namespace Xapu.SourceGen.DiConstructors.CompilationUtils
 {
     internal class DefaultCompilationSymbolParser : ICompilationSymbolParser
     {
-        private readonly GenerationConfig _config;
-
-        public DefaultCompilationSymbolParser(GenerationConfig config)
-        {
-            _config = config;
-        }
-
-        public bool HasInjectedAttribute(IFieldSymbol symbol)
-        {
-            foreach (var attribute in symbol.GetAttributes())
-            {
-                if (attribute.AttributeClass.Name == _config.InjectedAttributeName)
-                    return true;
-            }
-            return false;
-        }
-
         public bool IsClass(INamedTypeSymbol symbol)
         {
             return symbol.TypeKind == TypeKind.Class;
@@ -56,9 +39,19 @@ namespace Xapu.SourceGen.DiConstructors.CompilationUtils
                 return null;
         }
 
-        public IEnumerable<IFieldSymbol> GetFields(INamedTypeSymbol symbol)
+        public IEnumerable<IFieldSymbol> GetOwnFields(INamedTypeSymbol symbol)
         {
-            return GetFields(symbol, false);
+            foreach (var member in symbol.GetMembers())
+            {
+                if (member is IFieldSymbol field)
+                    yield return field;
+            }
+        }
+
+
+        public IEnumerable<AttributeData> GetAttributes(ISymbol symbol)
+        {
+            return symbol.GetAttributes();
         }
 
         public INamespaceSymbol GetNamespace(INamedTypeSymbol symbol)
@@ -85,26 +78,6 @@ namespace Xapu.SourceGen.DiConstructors.CompilationUtils
         public string GetConstructorName(INamedTypeSymbol symbol)
         {
             return symbol.Name;
-        }
-
-        private IEnumerable<IFieldSymbol> GetFields(INamedTypeSymbol symbol, bool inspectBase)
-        {
-            if (symbol == null)
-                yield break;
-
-            if (inspectBase)
-            {
-                var baseType = GetBaseType(symbol);
-
-                foreach (var field in GetFields(baseType, inspectBase))
-                    yield return field;
-            }
-
-            foreach (var member in symbol.GetMembers())
-            {
-                if (member is IFieldSymbol field)
-                    yield return field;
-            }
         }
 
         public IEnumerable<INamedTypeSymbol> GetPartialClasses(INamespaceOrTypeSymbol symbol)

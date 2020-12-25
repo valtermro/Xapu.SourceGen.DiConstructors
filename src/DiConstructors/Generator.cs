@@ -31,9 +31,9 @@ namespace Xapu.SourceGen.DiConstructors
 
             var config = LoadGenerationConfig();
 
-            SymbolParser = new DefaultCompilationSymbolParser(config);
+            SymbolParser = new DefaultCompilationSymbolParser();
             AttributeGenerator = new InjectedAttributeGenerator(config);
-            ConstructorGenerator = new TypeConstructorGenerator(SymbolParser);
+            ConstructorGenerator = new TypeConstructorGenerator(config, SymbolParser);
 
             GenerateInjectedAttribute();
             GenerateInjectorConstructors();
