@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xapu.SourceGen.DiConstructors.CompilationUtils;
@@ -12,8 +11,6 @@ namespace Xapu.SourceGen.DiConstructors
     [Generator]
     public class Generator : ISourceGenerator
     {
-        private const string AdditionalFileXmlRootNodeName = "DiConstructorGeneratorConfig";
-
         private GeneratorExecutionContext ExecutionContext;
         private DefaultCompilationSymbolParser SymbolParser;
         private TypeConstructorGenerator ConstructorGenerator;
@@ -46,36 +43,12 @@ namespace Xapu.SourceGen.DiConstructors
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void DoExecute()
         {
-            var config = LoadGenerationConfig();
+            var config = new GenerationConfig();
 
             SymbolParser = new DefaultCompilationSymbolParser();
             ConstructorGenerator = new TypeConstructorGenerator(config, SymbolParser);
 
             GenerateConstructors();
-        }
-
-        private GenerationConfig LoadGenerationConfig()
-        {
-            var configXDocument = GetAdditionalConfig();
-
-            return GenerationConfig.FromXDocument(configXDocument);
-        }
-
-        private XDocument GetAdditionalConfig()
-        {
-            foreach (var additionalFile in ExecutionContext.AdditionalFiles)
-            {
-                if (!additionalFile.Path.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                var text = additionalFile.GetText().ToString();
-                var config = XDocument.Parse(text);
-
-                if (config.Root.Name == AdditionalFileXmlRootNodeName)
-                    return config;
-            }
-
-            return default;
         }
 
         private void GenerateConstructors()
