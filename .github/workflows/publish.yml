@@ -1,0 +1,31 @@
+name: publish
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  package_and_publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+
+    - name: Create packages
+      env:
+         DOTNET_CLI_TELEMETRY_OPTOUT: true
+      run: dotnet pack --output pack --configuration Release /p:Version=$(echo ${{ github.event.release.tag_name }} | sed "s/^v//") /p:PackageReleaseNotes="See https://github.com/${{ github.repository }}/releases/tag/${{ github.event.release.tag_name }}"
+
+    - name: Archive packages
+      uses: actions/upload-artifact@v1
+      with:
+        name: packages
+        path: pack/
+
+    - name: Publish to nuget
+      run: dotnet nuget push pack/**/*.nupkg --api-key ${{ secrets.NUGET }} --source https://api.nuget.org/v3/index.json
