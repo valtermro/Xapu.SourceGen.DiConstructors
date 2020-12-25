@@ -88,7 +88,7 @@ namespace Xapu.SourceGen.DiConstructors.Generators
         {
             foreach (var field in _symbolParser.GetOwnFields(typeSymbol))
             {
-                if (HasInjectedAttribute(field))
+                if (HasAutoInjectAttribute(field))
                     yield return field;
             }
         }
@@ -107,11 +107,11 @@ namespace Xapu.SourceGen.DiConstructors.Generators
                 yield return field;
         }
 
-        private bool HasInjectedAttribute(ISymbol symbol)
+        private bool HasAutoInjectAttribute(ISymbol symbol)
         {
             foreach (var attribute in _symbolParser.GetAttributes(symbol))
             {
-                if (attribute.AttributeClass.Name == _config.InjectedAttributeName)
+                if (attribute.AttributeClass.ToString() == typeof(InjectedAttribute).FullName)
                     return true;
             }
             return false;

@@ -16,11 +16,7 @@ namespace Xapu.SourceGen.DiConstructors
 
         private GeneratorExecutionContext ExecutionContext;
         private DefaultCompilationSymbolParser SymbolParser;
-        private InjectedAttributeGenerator AttributeGenerator;
         private TypeConstructorGenerator ConstructorGenerator;
-
-        public string InjectedAttributeName { get; private set; }
-        public string InjectedAttributeNamespace { get; private set; }
 
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -30,7 +26,8 @@ namespace Xapu.SourceGen.DiConstructors
         {
             try
             {
-                DoExecute(context);
+                ExecutionContext = context;
+                DoExecute();
             }
             catch (Exception e)
             {
@@ -41,24 +38,20 @@ namespace Xapu.SourceGen.DiConstructors
                     category: typeof(Generator).FullName,
                     defaultSeverity: DiagnosticSeverity.Error,
                     isEnabledByDefault: true);
-                
+
                 context.ReportDiagnostic(Diagnostic.Create(descriptor, Location.None, e.Message));
             }
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public void DoExecute(GeneratorExecutionContext context)
+        public void DoExecute()
         {
-            ExecutionContext = context;
-
             var config = LoadGenerationConfig();
 
             SymbolParser = new DefaultCompilationSymbolParser();
-            AttributeGenerator = new InjectedAttributeGenerator(config);
             ConstructorGenerator = new TypeConstructorGenerator(config, SymbolParser);
 
-            GenerateInjectedAttribute();
-            GenerateInjectorConstructors();
+            GenerateConstructors();
         }
 
         private GenerationConfig LoadGenerationConfig()
@@ -85,16 +78,7 @@ namespace Xapu.SourceGen.DiConstructors
             return default;
         }
 
-        private void GenerateInjectedAttribute()
-        {
-            var buffer = new DefaultSourceTextBuffer();
-
-            AttributeGenerator.Execute(buffer);
-
-            AddSourceIfNotEmpty($"{InjectedAttributeName}Attribute", buffer);
-        }
-
-        private void GenerateInjectorConstructors()
+        private void GenerateConstructors()
         {
             var compilation = (CSharpCompilation)ExecutionContext.Compilation;
 

@@ -20,7 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\DiConstructors\Xapu.SourceGen.DiConstructors.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\DiConstructors\Xapu.SourceGen.DiConstructors.csproj" OutputItemType="Analyzer" />
 	</ItemGroup>
 
 </Project>

@@ -2,11 +2,6 @@
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
-	</PropertyGroup>
-
-	<PropertyGroup>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<NoWarn>1701;1702;NU5128</NoWarn>
 	</PropertyGroup>
 
