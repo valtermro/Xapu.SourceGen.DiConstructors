@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{12F49902-AA60-48FB-8CFA-ADC0F5E1B79A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xapu.SourceGen.DiConstructors", "src\DiConstructors\Xapu.SourceGen.DiConstructors.csproj", "{CBB26F04-2BFF-480E-9E7F-A01AEF41E8F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xapu.SourceGen.DiConstructors", "src\DiConstructors\Xapu.SourceGen.DiConstructors.csproj", "{CBB26F04-2BFF-480E-9E7F-A01AEF41E8F7}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xapu.SourceGen.DiConstructors.Tests", "src\DiConstructors.Tests\Xapu.SourceGen.DiConstructors.Tests.csproj", "{68961224-2858-47AD-96DF-703D96B5D774}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Xapu.SourceGen.DiConstructors.Tests", "src\DiConstructors.Tests\Xapu.SourceGen.DiConstructors.Tests.csproj", "{68961224-2858-47AD-96DF-703D96B5D774}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,9 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{CBB26F04-2BFF-480E-9E7F-A01AEF41E8F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -47,8 +42,10 @@ Global
 		{68961224-2858-47AD-96DF-703D96B5D774}.Release|x86.ActiveCfg = Release|Any CPU
 		{68961224-2858-47AD-96DF-703D96B5D774}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{CBB26F04-2BFF-480E-9E7F-A01AEF41E8F7} = {12F49902-AA60-48FB-8CFA-ADC0F5E1B79A}
-		{68961224-2858-47AD-96DF-703D96B5D774} = {12F49902-AA60-48FB-8CFA-ADC0F5E1B79A}
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8A754BFC-E154-4585-9A7F-C2D0462D9709}
 	EndGlobalSection
 EndGlobal
