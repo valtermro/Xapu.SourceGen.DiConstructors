@@ -7,13 +7,15 @@ namespace Xapu.SourceGen.DiConstructors
     {
         public string InjectedAttributeName { get; private set; }
         public string InjectedAttributeNamespace { get; private set; }
+        public string PostConstructorMethodName { get; private set; }
 
         private static GenerationConfig WithDefaults()
         {
             return new GenerationConfig
             {
                 InjectedAttributeName = "Injected",
-                InjectedAttributeNamespace = typeof(Generator).Namespace.ToString()
+                InjectedAttributeNamespace = typeof(Generator).Namespace.ToString(),
+                PostConstructorMethodName = "Initialize"
             };
         }
 
@@ -27,6 +29,9 @@ namespace Xapu.SourceGen.DiConstructors
 
             if (TryGetXElementValue(nameof(InjectedAttributeNamespace), out string injectedAttrNamespace))
                 config.InjectedAttributeNamespace = injectedAttrNamespace;
+
+            if (TryGetXElementValue(nameof(PostConstructorMethodName), out string postConstructorMethodName))
+                config.PostConstructorMethodName = postConstructorMethodName;
 
             return config;
 

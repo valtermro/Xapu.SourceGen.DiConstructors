@@ -56,7 +56,32 @@ namespace Xapu.SourceGen.DiConstructors.Generators
 
             buffer.BeginBlock();
             WriteBindingList(buffer, ownFields);
+            ResolvePostControllerMethodCall(buffer, typeSymbol);
             buffer.EndBlock();
+        }
+
+        private void ResolvePostControllerMethodCall(ISourceTextBuffer buffer, INamedTypeSymbol typeSymbol)
+        {
+            var postControllerMethod = GetPostControllerMethod(typeSymbol);
+            
+            if (postControllerMethod == null)
+                return;
+
+            // override method is called only by the base type
+            if (_symbolParser.IsOverrideMember(postControllerMethod))
+                return;
+
+            buffer.WriteLine($"{_config.PostConstructorMethodName}();");
+        }
+
+        private IMethodSymbol GetPostControllerMethod(INamedTypeSymbol symbol)
+        {
+            foreach (var method in _symbolParser.GetOwnMethods(symbol))
+            {
+                if (method.Name == _config.PostConstructorMethodName)
+                    return method;
+            }
+            return default;
         }
 
         private IEnumerable<IFieldSymbol> GetOwnFieldsToInject(INamedTypeSymbol typeSymbol)
@@ -66,16 +91,6 @@ namespace Xapu.SourceGen.DiConstructors.Generators
                 if (HasInjectedAttribute(field))
                     yield return field;
             }
-        }
-
-        private bool HasInjectedAttribute(ISymbol symbol)
-        {
-            foreach (var attribute in _symbolParser.GetAttributes(symbol))
-            {
-                if (attribute.AttributeClass.Name == _config.InjectedAttributeName)
-                    return true;
-            }
-            return false;
         }
 
         private IEnumerable<IFieldSymbol> GetInheritedFieldsToInject(INamedTypeSymbol typeSymbol)
@@ -90,6 +105,16 @@ namespace Xapu.SourceGen.DiConstructors.Generators
 
             foreach (var field in GetOwnFieldsToInject(baseType))
                 yield return field;
+        }
+
+        private bool HasInjectedAttribute(ISymbol symbol)
+        {
+            foreach (var attribute in _symbolParser.GetAttributes(symbol))
+            {
+                if (attribute.AttributeClass.Name == _config.InjectedAttributeName)
+                    return true;
+            }
+            return false;
         }
 
         private void WriteParameterList(ISourceTextBuffer buffer, IEnumerable<IFieldSymbol> fields)

@@ -48,6 +48,14 @@ namespace Xapu.SourceGen.DiConstructors.CompilationUtils
             }
         }
 
+        public IEnumerable<IMethodSymbol> GetOwnMethods(INamedTypeSymbol symbol)
+        {
+            foreach (var member in symbol.GetMembers())
+            {
+                if (member is IMethodSymbol method)
+                    yield return method;
+            }
+        }
 
         public IEnumerable<AttributeData> GetAttributes(ISymbol symbol)
         {
@@ -57,6 +65,11 @@ namespace Xapu.SourceGen.DiConstructors.CompilationUtils
         public INamespaceSymbol GetNamespace(INamedTypeSymbol symbol)
         {
             return symbol.ContainingNamespace;
+        }
+
+        public bool IsOverrideMember(ISymbol symbol)
+        {
+            return symbol.IsOverride;
         }
 
         public string GetNamespaceName(INamedTypeSymbol symbol)
