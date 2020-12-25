@@ -26,6 +26,15 @@ namespace Xapu.SourceGen.DiConstructors.Tests
         }
 
         [Fact]
+        public void WithOnlyInheritedInjectedFields()
+        {
+            var calculator = new ChildBasicCalculator(new Addition(), new Subtraction());
+
+            Assert.Equal(3, calculator.Add(2, 1));
+            Assert.Equal(1, calculator.Subtract(2, 1));
+        }
+
+        [Fact]
         public void ForGenericTypes()
         {
             var relayer2 = new DoubleDummyRelayer<int, string>(new Relayer<int>(), new Relayer<string>());

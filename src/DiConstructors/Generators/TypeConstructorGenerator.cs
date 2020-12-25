@@ -8,41 +8,45 @@ namespace Xapu.SourceGen.DiConstructors.Generators
 {
     internal class TypeConstructorGenerator
     {
+        private readonly GenerationConfig _config;
         private readonly ICompilationSymbolParser _symbolParser;
 
-        public TypeConstructorGenerator(ICompilationSymbolParser symbolParser)
+        public TypeConstructorGenerator(GenerationConfig config, ICompilationSymbolParser symbolParser)
         {
+            _config = config;
             _symbolParser = symbolParser;
         }
 
         public void Execute(ISourceTextBuffer buffer, INamedTypeSymbol typeSymbol)
         {
-            var selfFieldsToInject = GetSelfFieldsToInject(typeSymbol);
+            var ownFieldsToInject = GetOwnFieldsToInject(typeSymbol);
             var inheritedFieldsToInject = GetInheritedFieldsToInject(typeSymbol);
 
-            if (!selfFieldsToInject.Any()) return;
+            if (!ownFieldsToInject.Any() && !inheritedFieldsToInject.Any())
+                return;
 
             var classNamespace = _symbolParser.GetNamespaceName(typeSymbol);
             var className = _symbolParser.GetTypeName(typeSymbol);
-            var constructorName = _symbolParser.GetConstructorName(typeSymbol);
 
             buffer.WriteLine($"namespace {classNamespace}");
             buffer.BeginBlock();
 
             buffer.WriteLine($"public partial class {className}");
             buffer.BeginBlock();
-            WriteConstructor(buffer, constructorName, selfFieldsToInject, inheritedFieldsToInject);
+            WriteConstructor(buffer, typeSymbol, ownFieldsToInject, inheritedFieldsToInject);
             buffer.EndBlock();
-            
+
             buffer.EndBlock();
         }
 
-        private static void WriteConstructor(ISourceTextBuffer buffer, string name, IEnumerable<IFieldSymbol> selfFields, IEnumerable<IFieldSymbol> inheritedFields)
+        private void WriteConstructor(ISourceTextBuffer buffer, INamedTypeSymbol typeSymbol, IEnumerable<IFieldSymbol> ownFields, IEnumerable<IFieldSymbol> inheritedFields)
         {
+            var name = _symbolParser.GetConstructorName(typeSymbol);
+
             buffer.WriteLine($"public {name}(");
             buffer.Indent();
 
-            WriteParameterList(buffer, inheritedFields.Concat(selfFields));
+            WriteParameterList(buffer, inheritedFields.Concat(ownFields));
 
             buffer.WriteLine($")");
             buffer.Dedent();
@@ -51,34 +55,44 @@ namespace Xapu.SourceGen.DiConstructors.Generators
                 WriteBaseInitCall(buffer, inheritedFields);
 
             buffer.BeginBlock();
-            WriteBindingList(buffer, selfFields);
+            WriteBindingList(buffer, ownFields);
             buffer.EndBlock();
         }
 
-        private IEnumerable<IFieldSymbol> GetSelfFieldsToInject(INamedTypeSymbol typeSymbol)
+        private IEnumerable<IFieldSymbol> GetOwnFieldsToInject(INamedTypeSymbol typeSymbol)
         {
-            foreach (var field in _symbolParser.GetFields(typeSymbol))
+            foreach (var field in _symbolParser.GetOwnFields(typeSymbol))
             {
-                if (_symbolParser.HasInjectedAttribute(field))
+                if (HasInjectedAttribute(field))
                     yield return field;
             }
+        }
+
+        private bool HasInjectedAttribute(ISymbol symbol)
+        {
+            foreach (var attribute in _symbolParser.GetAttributes(symbol))
+            {
+                if (attribute.AttributeClass.Name == _config.InjectedAttributeName)
+                    return true;
+            }
+            return false;
         }
 
         private IEnumerable<IFieldSymbol> GetInheritedFieldsToInject(INamedTypeSymbol typeSymbol)
         {
             var baseType = _symbolParser.GetBaseType(typeSymbol);
-            
+
             if (baseType == null)
                 yield break;
 
             foreach (var field in GetInheritedFieldsToInject(baseType))
                 yield return field;
 
-            foreach (var field in GetSelfFieldsToInject(baseType))
+            foreach (var field in GetOwnFieldsToInject(baseType))
                 yield return field;
         }
 
-        private static void WriteParameterList(ISourceTextBuffer buffer, IEnumerable<IFieldSymbol> fields)
+        private void WriteParameterList(ISourceTextBuffer buffer, IEnumerable<IFieldSymbol> fields)
         {
             var head = fields.Take(fields.Count() - 1);
             var last = fields.Last();
@@ -89,14 +103,14 @@ namespace Xapu.SourceGen.DiConstructors.Generators
             buffer.Write($"{last.Type} {last.Name}");
         }
 
-        private static void WriteBaseInitCall(ISourceTextBuffer buffer, IEnumerable<IFieldSymbol> fields)
+        private void WriteBaseInitCall(ISourceTextBuffer buffer, IEnumerable<IFieldSymbol> fields)
         {
             buffer.Write(": base(");
             WriteBaseArgumentList(buffer, fields);
             buffer.WriteLine(")");
         }
 
-        private static void WriteBaseArgumentList(ISourceTextBuffer buffer, IEnumerable<IFieldSymbol> fields)
+        private void WriteBaseArgumentList(ISourceTextBuffer buffer, IEnumerable<IFieldSymbol> fields)
         {
             var head = fields.Take(fields.Count() - 1);
             var last = fields.Last();
@@ -107,9 +121,9 @@ namespace Xapu.SourceGen.DiConstructors.Generators
             buffer.Write(last.Name);
         }
 
-        private static void WriteBindingList(ISourceTextBuffer buffer, IEnumerable<IFieldSymbol> selfFields)
+        private void WriteBindingList(ISourceTextBuffer buffer, IEnumerable<IFieldSymbol> fields)
         {
-            foreach (var field in selfFields)
+            foreach (var field in fields)
                 buffer.WriteLine($"this.{field.Name} = {field.Name};");
         }
     }

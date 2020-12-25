@@ -24,7 +24,7 @@ namespace Xapu.SourceGen.DiConstructors
 
             if (TryGetXElementValue(nameof(InjectedAttributeName), out string injectedAttrName))
                 config.InjectedAttributeName = injectedAttrName;
-            
+
             if (TryGetXElementValue(nameof(InjectedAttributeNamespace), out string injectedAttrNamespace))
                 config.InjectedAttributeNamespace = injectedAttrNamespace;
 

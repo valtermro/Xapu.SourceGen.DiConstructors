@@ -29,6 +29,10 @@
         public int Subtract(int a, int b) => Subtraction.Execute(a, b);
     }
 
+    public partial class ChildBasicCalculator : BasicCalculator
+    {
+    }
+
     public partial class IntermediateCalculator : BasicCalculator
     {
         [Injected] private readonly Multiplication Multiplication;
