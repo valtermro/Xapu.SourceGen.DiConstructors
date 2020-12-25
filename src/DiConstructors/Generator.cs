@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -26,6 +27,27 @@ namespace Xapu.SourceGen.DiConstructors
         }
 
         public void Execute(GeneratorExecutionContext context)
+        {
+            try
+            {
+                DoExecute(context);
+            }
+            catch (Exception e)
+            {
+                var descriptor = new DiagnosticDescriptor(
+                    id: "DCG0001",
+                    title: $"An exception was thrown by {typeof(Generator).FullName}",
+                    messageFormat: $"An exception was thrown by {typeof(Generator).FullName}: '{{0}}'",
+                    category: typeof(Generator).FullName,
+                    defaultSeverity: DiagnosticSeverity.Error,
+                    isEnabledByDefault: true);
+                
+                context.ReportDiagnostic(Diagnostic.Create(descriptor, Location.None, e.Message));
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public void DoExecute(GeneratorExecutionContext context)
         {
             ExecutionContext = context;
 
