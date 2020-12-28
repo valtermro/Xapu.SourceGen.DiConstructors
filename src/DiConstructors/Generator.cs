@@ -58,11 +58,20 @@ namespace Xapu.SourceGen.DiConstructors
             foreach (var typeSymbol in SymbolParser.GetPartialClasses(compilation.GlobalNamespace))
             {
                 var buffer = new DefaultSourceTextBuffer();
+                var className = ResolveTypeHintName(typeSymbol);
 
                 ConstructorGenerator.Execute(buffer, typeSymbol);
 
-                AddSourceIfNotEmpty(typeSymbol.Name, buffer);
+                AddSourceIfNotEmpty(className, buffer);
             }
+        }
+
+        private string ResolveTypeHintName(INamedTypeSymbol symbol)
+        {
+            if (!symbol.IsGenericType)
+                return symbol.Name;
+            else
+                return $"{symbol.Name}_{symbol.TypeArguments.Length}";
         }
 
         private void AddSourceIfNotEmpty(string className, ISourceTextBuffer sourceBuffer)

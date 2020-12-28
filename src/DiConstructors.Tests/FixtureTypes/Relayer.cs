@@ -12,7 +12,7 @@
         public T RelayT(T arg) => _relayerT.Relay(arg);
     }
 
-    public partial class DoubleDummyRelayer<T, U> : DummyRelayer<T>
+    public partial class DummyRelayer<T, U> : DummyRelayer<T>
     {
         [Injected] private readonly Relayer<U> _relayerU;
 
