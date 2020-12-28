@@ -37,7 +37,7 @@ namespace Xapu.SourceGen.DiConstructors.Tests
         [Fact]
         public void ForGenericTypes()
         {
-            var relayer2 = new DoubleDummyRelayer<int, string>(new Relayer<int>(), new Relayer<string>());
+            var relayer2 = new DummyRelayer<int, string>(new Relayer<int>(), new Relayer<string>());
 
             Assert.Equal(42, relayer2.RelayT(42));
             Assert.Equal("Foo", relayer2.RelayU("Foo"));
